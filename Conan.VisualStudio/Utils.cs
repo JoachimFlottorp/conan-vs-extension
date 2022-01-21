@@ -46,8 +46,9 @@ namespace Conan.VisualStudio
                     token, TaskCreationOptions.None, TaskScheduler.Default);
 
                 int exitCode = await exeProcess.WaitForExitAsync();
-
-                Task.WaitAll(outputReader, errorReader);
+                
+                await outputReader;
+                await errorReader;
 
                 return exitCode;
             }

@@ -57,6 +57,11 @@ namespace Conan.VisualStudio
             // Handle commandline switch
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             var cmdLine = await GetServiceAsync(typeof(SVsAppCommandLine)) as IVsAppCommandLine;
+            if (cmdLine == null)
+            {
+                throw new ArgumentException("empty cmd line");
+            }
+
             ErrorHandler.ThrowOnFailure(cmdLine.GetOption(_cliSwitch, out int isPresent, out string optionValue));
             if (isPresent == 1)
             {
@@ -193,7 +198,7 @@ namespace Conan.VisualStudio
         private void InstallConanDeps(IVCProject vcProject)
         {
             _errorListService.Clear();
-            ThreadHelper.JoinableTaskFactory.RunAsync(
+            JoinableTask task = ThreadHelper.JoinableTaskFactory.RunAsync(
                 async delegate
                 {
                     bool success = await _conanService.InstallAsync(vcProject);

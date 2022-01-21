@@ -1,8 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Conan.VisualStudio.Core.VCInterfaces;
 using Microsoft.VisualStudio.VCProjectEngine;
 
@@ -33,22 +30,22 @@ namespace Conan.VisualStudio.VCProjectWrapper
             }
         }
 
-        public string ProjectDirectory => _configuration.project.ProjectDirectory;
+        public string ProjectDirectory => (_configuration.project as VCProject).ProjectDirectory;
 
-        public string ProjectName => _configuration.project.Name;
+        public string ProjectName => (_configuration.project as VCProject).Name;
 
         public string Name => _configuration.Name;
 
         public string ConfigurationName => _configuration.ConfigurationName;
 
-        public string PlatformName => _configuration.Platform.Name;
+        public string PlatformName => (_configuration.Platform as VCPlatform).Name;
 
         public string RuntimeLibrary
         {
             get
             {
-                var VCCLCompilerTool = _configuration.Tools.Item("VCCLCompilerTool");
-                return VCCLCompilerTool != null ? RuntimeLibraryToString(VCCLCompilerTool.RuntimeLibrary) : null;
+                var VCCLCompilerTool = (_configuration.Tools as IVCCollection).Item("VCCLCompilerTool");
+                return VCCLCompilerTool != null ? RuntimeLibraryToString((VCCLCompilerTool as VCCLCompilerTool).RuntimeLibrary) : null;
             }
         }
 
@@ -56,7 +53,7 @@ namespace Conan.VisualStudio.VCProjectWrapper
         {
             get
             {
-                IVCRulePropertyStorage generalSettings = _configuration.Rules.Item("ConfigurationGeneral");
+                IVCRulePropertyStorage generalSettings = (_configuration.Rules as IVCCollection).Item("ConfigurationGeneral") as IVCRulePropertyStorage;
                 return generalSettings.GetEvaluatedPropertyValue("PlatformToolset");
             }
         }
@@ -73,9 +70,7 @@ namespace Conan.VisualStudio.VCProjectWrapper
 
         public void CollectIntelliSenseInfo()
         {
-#if VS15
-            _configuration.CollectIntelliSenseInfo();
-#endif
+            // no no
         }
 
         public List<IVCPropertySheet> PropertySheets
@@ -83,7 +78,7 @@ namespace Conan.VisualStudio.VCProjectWrapper
             get
             {
                 List<IVCPropertySheet> propertySheets = new List<IVCPropertySheet>();
-                foreach (VCPropertySheet propertySheet in _configuration.PropertySheets)
+                foreach (VCPropertySheet propertySheet in _configuration.PropertySheets as IVCCollection)
                     propertySheets.Add(new VCPropertySheetWrapper(propertySheet));
                 return propertySheets;
             }

@@ -1,6 +1,7 @@
-﻿<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
-    <Metadata>
-        <Identity Id="VSConanPackage.4d0379e2-2698-4e66-89de-6ead71165e9f" Version="1.2.2" Language="en-US" Publisher="Conan" />
+<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+	<Metadata>
+        <Identity Id="VSConanPackage.4d0379e2-2698-4e66-89de-6ead71165e9f" Version="1.2.3" Language="en-US" Publisher="Conan" />
         <DisplayName>Conan Extension for Visual Studio</DisplayName>
         <Description xml:space="preserve">Conan Extension for Visual Studio automates the use of the Conan C/C++ package manager for retrieving dependencies within Visual Studio projects.</Description>
         <MoreInfo>https://github.com/conan-io/conan-vs-extension</MoreInfo>
@@ -10,18 +11,27 @@
         <PreviewImage>Resources\Preview.png</PreviewImage>
         <Tags>conan; c++; c; packaging</Tags>
     </Metadata>
-    <Installation>
-        <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[14.0,17.0)" />
-    </Installation>
-    <Dependencies>
-        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
-    </Dependencies>
-    <Prerequisites>
-        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[14.0,17.0)" DisplayName="Visual Studio core editor" />
-    </Prerequisites>
-    <Assets>
-        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
-        <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="%CurrentProject%.VCProjectWrapper14" Path="|Conan.VisualStudio.VCProjectWrapper14|" AssemblyName="|Conan.VisualStudio.VCProjectWrapper14;AssemblyName|" />
-        <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="%CurrentProject%.VCProjectWrapper15" Path="|Conan.VisualStudio.VCProjectWrapper15|" AssemblyName="|Conan.VisualStudio.VCProjectWrapper15;AssemblyName|" />
-    </Assets>
+  <Installation>
+    <InstallationTarget Version="[11.0,17.0)" Id="Microsoft.VisualStudio.Community" />
+    <InstallationTarget Version="[11.0,17.0)" Id="Microsoft.VisualStudio.Pro" />
+    <!-- This will work for x86 targets, but these are not currently supported by the marketplace. -->
+    <InstallationTarget Version="[17.0,18.0)" Id="Microsoft.VisualStudio.Community">
+      <ProductArchitecture>x86</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Version="[17.0,18.0)" Id="Microsoft.VisualStudio.Community">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Version="[17.0,18.0)" Id="Microsoft.VisualStudio.Pro">
+	    <ProductArchitecture>x86</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Version="[17.0,18.0)" Id="Microsoft.VisualStudio.Pro">
+	    <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+  </Installation>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,18.0)" DisplayName="Visual Studio core editor" />
+  </Prerequisites>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Conan.VisualStudio.Core" TargetVersion="[17.0,18.0)" Path="|Conan.VisualStudio.Core|" />
+  </Assets>
 </PackageManifest>

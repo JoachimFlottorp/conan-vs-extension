@@ -22,7 +22,7 @@ namespace Conan.VisualStudio.VCProjectWrapper
             get
             {
                 List<IVCConfiguration> configurations = new List<IVCConfiguration>();
-                foreach (VCConfiguration configuration in _project.Configurations)
+                foreach (VCConfiguration configuration in _project.Configurations as IVCCollection)
                     configurations.Add(new VCConfigurationWrapper(configuration));
                 return configurations;
             }

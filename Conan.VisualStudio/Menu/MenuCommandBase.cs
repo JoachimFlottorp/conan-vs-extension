@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.Design;
 using Conan.VisualStudio.Services;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Threading;
 
 namespace Conan.VisualStudio.Menu
 {
@@ -38,7 +39,7 @@ namespace Conan.VisualStudio.Menu
 
         private void MenuItemCallback(object sender, EventArgs e)
         {
-            ThreadHelper.JoinableTaskFactory.RunAsync(
+            JoinableTask t = ThreadHelper.JoinableTaskFactory.RunAsync(
                 async delegate
                 {
                     await CallMenuItemBallbackAsync();

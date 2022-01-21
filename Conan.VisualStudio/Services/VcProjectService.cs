@@ -50,7 +50,9 @@ namespace Conan.VisualStudio.Services
             string path = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             path = Path.Combine(path, wrapperDLL);
 
-            var instance = AppDomain.CurrentDomain.CreateInstanceFromAndUnwrap(path,
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
+
+         var instance = AppDomain.CurrentDomain.CreateInstanceFromAndUnwrap(path,
                 "Conan.VisualStudio.VCProjectWrapper.VCProjectWrapper",
                 false, BindingFlags.Default, null, new[] { project.Object }, null, null);
 
@@ -59,19 +61,19 @@ namespace Conan.VisualStudio.Services
 
         private static IVCProject AsVCProjectImpl(Project project)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             return CreateVCProjectWrapper(project);
         }
 
         public IVCProject AsVCProject(Project project)
         {
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             return AsVCProjectImpl(project);
         }
 
         private static IVCProject GetActiveProject(DTE dte)
         {
-            ThreadHelper.ThrowIfNotOnUIThread();
-
+            Microsoft.VisualStudio.Shell.ThreadHelper.ThrowIfNotOnUIThread();
             var projects = (object[])dte.ActiveSolutionProjects;
             return AsVCProjectImpl(projects.Cast<Project>().Where(IsCppProject).FirstOrDefault());
         }
