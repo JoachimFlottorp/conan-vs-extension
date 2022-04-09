@@ -1,0 +1,92 @@
+name: MSBuild
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - dev
+
+env:
+  # Path to the solution file relative to the root of the project.
+  SOLUTION_FILE_PATH: .
+
+  # Configuration type to build.
+  # You can convert this to a build matrix if you need coverage of multiple configuration types.
+  # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+  BUILD_CONFIGURATION: Release
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  RepositoryUrl: 'https://github.com/${{ github.repository }}'
+  RepositoryBranch: '${{ github.ref }}'
+  SourceRevisionId: '${{ github.sha }}'
+  VersionSuffix: 'pr-${{github.event.number}}.${{ github.run_number }}'
+  Configuration: Release
+  SolutionPath: Conan.VisualStudio.sln
+  VsixManifestPath: src\Conan.VisualStudio\source.extension.vsixmanifest
+
+permissions:
+  contents: read
+
+jobs:
+  build-extension:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.x'
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Restore NuGet packages
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: nuget restore ${{env.SOLUTION_FILE_PATH}}
+
+    - name: Calculate next version
+      uses: cezarypiatek/NextVersionGeneratorAction@0.4
+      with:
+        minor-pattern: '\bAdd\b'
+        patch-pattern: '.*'
+        output-to-env-variable: 'VersionPrefix'
+
+    - name: Set version for Visual Studio Extension
+      uses: cezarypiatek/VsixVersionAction@1.0
+      with:
+        version: '${{env.VersionPrefix}}+${{env.VersionSuffix}}'
+        vsix-manifest-file: ${{ env.VsixManifestPath }}
+
+    - name: Build Extension
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      # Add additional options to the MSBuild command line here (like platform or verbosity level).
+      # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
+      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}} /t:Rebuild
+      env: 
+        DeployExtension: False
+
+    - name: Run Tests
+      run: dotnet test --no-build -verbosity normal ${{ env.SOLUTION_FILE_PATH }}
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.Version }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset - VSIX
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ env.VsixPath }}
+        asset_name: Conan.vsix
+        asset_content_type: binary/octet-stream
