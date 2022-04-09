@@ -23,7 +23,7 @@ env:
   VersionSuffix: 'pr-${{github.event.number}}.${{ github.run_number }}'
   Configuration: Release
   SolutionPath: Conan.VisualStudio.sln
-  VsixManifestPath: src\Conan.VisualStudio\source.extension.vsixmanifest
+  VsixManifestPath: Conan.VisualStudio\source.extension.vsixmanifest
 
 permissions:
   contents: read
