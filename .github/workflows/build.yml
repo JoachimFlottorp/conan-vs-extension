@@ -23,6 +23,7 @@ env:
   VersionSuffix: 'pr-${{github.event.number}}.${{ github.run_number }}'
   SolutionPath: Conan.VisualStudio.sln
   VsixManifestPath: Conan.VisualStudio\source.extension.vsixmanifest
+  VsixPath: Conan.VisualStudio\bin\Release\Conan.VisualStudio.vsix
 
 permissions:
   contents: read
@@ -76,7 +77,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ env.Version }}
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
         draft: false
         prerelease: false
 
@@ -86,6 +88,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ env.VsixPath }}
-        asset_name: Conan.vsix
+        asset_path: ${{ env.VsiXPath }}
+        asset_name: Conan.VisualStudio.${{ github.ref }}.vsix
         asset_content_type: binary/octet-stream
