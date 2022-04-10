@@ -25,9 +25,6 @@ env:
   VsixManifestPath: Conan.VisualStudio\source.extension.vsixmanifest
   VsixPath: Conan.VisualStudio\bin\Release\Conan.VisualStudio.vsix
 
-permissions:
-  contents: read
-
 jobs:
   build-extension:
     runs-on: windows-latest
