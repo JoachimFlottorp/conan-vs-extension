@@ -21,7 +21,6 @@ env:
   RepositoryBranch: '${{ github.ref }}'
   SourceRevisionId: '${{ github.sha }}'
   VersionSuffix: 'pr-${{github.event.number}}.${{ github.run_number }}'
-  Configuration: Release
   SolutionPath: Conan.VisualStudio.sln
   VsixManifestPath: Conan.VisualStudio\source.extension.vsixmanifest
 
@@ -45,7 +44,7 @@ jobs:
 
     - name: Restore NuGet packages
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      run: nuget restore $env:SolutionPath
+      run: nuget restore $env:SolutionPath -PackagesDirectory ./packages
 
     - name: Calculate next version
       uses: cezarypiatek/NextVersionGeneratorAction@0.4
@@ -64,12 +63,12 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} $env:SolutionPath /t:Rebuild
+      run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} $env:SolutionPath /t:Rebuild /p:DeployExtension=false
       env: 
         DeployExtension: False
 
     - name: Run Tests
-      run: dotnet test --no-build -verbosity normal $env:SolutionPath
+      run: dotnet test --no-build -verbosity:normal $env:SolutionPath
 
     - name: Create Release
       id: create_release
